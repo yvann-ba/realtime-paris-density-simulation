@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paris Traffic — Real-Time Density</title>
+  
+  <!-- Mapbox GL JS -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v3.0.1/mapbox-gl.css" rel="stylesheet" />
+  
+  <!-- Deck.gl -->
+  <script src="https://unpkg.com/deck.gl@9.0.1/dist.min.js"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Main Map Container -->
+  <div id="map-container">
+    <div id="map"></div>
+    <canvas id="deck-canvas"></canvas>
+  </div>
+
+  <!-- Control Panel -->
+  <div id="control-panel">
+    <div class="panel-header">
+      <h2>Paris Traffic</h2>
+      <p class="subtitle">Real-time density visualization</p>
+      <span id="fps-display" class="fps-badge">-- FPS</span>
+    </div>
+
+    <!-- Real-time Toggle -->
+    <div class="control-group toggle-group">
+      <label class="toggle-label">
+        <input type="checkbox" id="realtime-toggle" checked>
+        <span class="toggle-slider"></span>
+        <span class="label-text">LIVE STREAMING</span>
+      </label>
+    </div>
+
+    <!-- Time Slider -->
+    <div class="control-group">
+      <label for="time-slider">
+        <span class="label-text">Hour</span>
+        <span id="time-display" class="value-display">14:00</span>
+      </label>
+      <input type="range" id="time-slider" min="0" max="23" value="14" step="1">
+    </div>
+
+    <!-- Day Selector -->
+    <div class="control-group">
+      <label for="day-select">
+        <span class="label-text">Day</span>
+      </label>
+      <select id="day-select">
+        <option value="1">Monday</option>
+        <option value="2">Tuesday</option>
+        <option value="3">Wednesday</option>
+        <option value="4">Thursday</option>
+        <option value="5" selected>Friday</option>
+        <option value="6">Saturday</option>
+        <option value="0">Sunday</option>
+      </select>
+    </div>
+
+    <!-- Section: Main Heatmap -->
+    <div class="control-section">
+      <h3 class="section-title">Heatmap</h3>
+      
+      <div class="control-group">
+        <label>
+          <span class="label-text">Intensity</span>
+          <span id="intensity-display" class="value-display">1.5</span>
+        </label>
+        <input type="range" id="intensity-slider" min="0.1" max="4" value="1.5" step="0.1">
+      </div>
+      
+      <div class="control-group">
+        <label>
+          <span class="label-text">Radius</span>
+          <span id="radius-display" class="value-display">50px</span>
+        </label>
+        <input type="range" id="radius-slider" min="10" max="150" value="50" step="5">
+      </div>
+      
+      <div class="control-group">
+        <label>
+          <span class="label-text">Threshold</span>
+          <span id="threshold-display" class="value-display">0.03</span>
+        </label>
+        <input type="range" id="threshold-slider" min="0" max="0.2" value="0.03" step="0.01">
+      </div>
+      
+      <div class="control-group">
+        <label>
+          <span class="label-text">Opacity</span>
+          <span id="opacity-display" class="value-display">70%</span>
+        </label>
+        <input type="range" id="opacity-slider" min="20" max="100" value="70" step="5">
+      </div>
+    </div>
+
+    <!-- Section: Ambient Glow -->
+    <div class="control-section">
+      <h3 class="section-title">
+        Ambient Glow
+        <label class="mini-toggle">
+          <input type="checkbox" id="glow-toggle" checked>
+          <span class="mini-toggle-slider"></span>
+        </label>
+      </h3>
+      
+      <div class="control-group">
+        <label>
+          <span class="label-text">Glow Intensity</span>
+          <span id="glow-intensity-display" class="value-display">0.6</span>
+        </label>
+        <input type="range" id="glow-intensity-slider" min="0" max="2" value="0.6" step="0.1">
+      </div>
+      
+      <div class="control-group">
+        <label>
+          <span class="label-text">Glow Radius</span>
+          <span id="glow-radius-display" class="value-display">100px</span>
+        </label>
+        <input type="range" id="glow-radius-slider" min="30" max="250" value="100" step="10">
+      </div>
+    </div>
+
+    <!-- Section: Hotspots -->
+    <div class="control-section">
+      <h3 class="section-title">
+        Hotspots
+        <label class="mini-toggle">
+          <input type="checkbox" id="hotspot-toggle" checked>
+          <span class="mini-toggle-slider"></span>
+        </label>
+      </h3>
+      
+      <div class="control-group">
+        <label>
+          <span class="label-text">Hotspot Intensity</span>
+          <span id="hotspot-intensity-display" class="value-display">2.5</span>
+        </label>
+        <input type="range" id="hotspot-intensity-slider" min="0.5" max="5" value="2.5" step="0.1">
+      </div>
+      
+      <div class="control-group">
+        <label>
+          <span class="label-text">Hotspot Radius</span>
+          <span id="hotspot-radius-display" class="value-display">30px</span>
+        </label>
+        <input type="range" id="hotspot-radius-slider" min="10" max="80" value="30" step="5">
+      </div>
+      
+      <div class="control-group">
+        <label>
+          <span class="label-text">Density Threshold</span>
+          <span id="hotspot-threshold-display" class="value-display">45%</span>
+        </label>
+        <input type="range" id="hotspot-threshold-slider" min="20" max="80" value="45" step="5">
+      </div>
+    </div>
+
+    <!-- Section: Style & Animation -->
+    <div class="control-section">
+      <h3 class="section-title">Style & Animation</h3>
+      
+      <div class="control-group">
+        <label for="color-preset">
+          <span class="label-text">Color Scheme</span>
+        </label>
+        <select id="color-preset">
+          <option value="vibrant" selected>Vibrant</option>
+          <option value="heat">Heat</option>
+          <option value="cool">Cool</option>
+          <option value="plasma">Plasma</option>
+          <option value="fire">Fire</option>
+        </select>
+      </div>
+      
+      <div class="control-group">
+        <label>
+          <span class="label-text">Update Speed</span>
+          <span id="update-interval-display" class="value-display">500ms</span>
+        </label>
+        <input type="range" id="update-interval-slider" min="50" max="2000" value="500" step="50">
+      </div>
+      
+      <div class="control-group">
+        <label>
+          <span class="label-text">Live Variation</span>
+          <span id="noise-display" class="value-display">15%</span>
+        </label>
+        <input type="range" id="noise-slider" min="0" max="0.5" value="0.08" step="0.01">
+      </div>
+      
+      <div class="control-group">
+        <label>
+          <span class="label-text">Animation Speed</span>
+          <span id="animation-speed-display" class="value-display">2 h/min</span>
+        </label>
+        <input type="range" id="animation-speed-slider" min="0.5" max="10" value="2" step="0.5">
+        <div class="speed-hints">
+          <span>Slow</span>
+          <span>Normal</span>
+          <span>Fast</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <h3>Traffic Density</h3>
+      <div class="legend-gradient"></div>
+      <div class="legend-labels">
+        <span>Low</span>
+        <span>Medium</span>
+        <span>High</span>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-panel">
+      <div class="stat">
+        <span class="stat-value" id="stat-zones">--</span>
+        <span class="stat-label">Zones</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="stat-avg">--</span>
+        <span class="stat-label">Avg</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="stat-max">--</span>
+        <span class="stat-label">Peak</span>
+      </div>
+    </div>
+
+    <!-- Play Button -->
+    <button id="play-btn" class="play-button">
+      <span id="play-icon">▶</span>
+      <span id="play-text">Animate Smoothly</span>
+    </button>
+  </div>
+
+  <!-- Tooltip -->
+  <div id="tooltip" class="tooltip"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay">
+    <div class="loader">
+      <div class="loader-spinner"></div>
+      <p>Loading Paris data...</p>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "paris-busy-visualization",
+  "version": "1.0.0",
+  "description": "3D visualization of Paris foot traffic density with cloud-like heatmap",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
+    "generate-mock": "node scripts/generateMockData.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "h3-js": "^4.1.0",
+    "axios": "^1.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
