@@ -2,6 +2,8 @@
 
 An interactive 3D web visualization simulating foot traffic in Paris. This project uses mathematical models to generate realistic movement patterns based on city points of interest.
 
+I'm working on this big planetary engine thing right now : https://terra-lab.ai/
+
 
 https://github.com/user-attachments/assets/126584bd-428e-4492-986f-9e259a30aac1
 
