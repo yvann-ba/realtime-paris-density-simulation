@@ -2,6 +2,10 @@
 
 An interactive 3D web visualization simulating foot traffic in Paris. This project uses mathematical models to generate realistic movement patterns based on city points of interest.
 
+
+https://github.com/user-attachments/assets/126584bd-428e-4492-986f-9e259a30aac1
+
+
 ## Features
 
 - **H3 Indexing**: Uses the H3 hexagonal grid system for high-performance spatial aggregation.
@@ -28,8 +32,8 @@ An interactive 3D web visualization simulating foot traffic in Paris. This proje
 
 1. **Clone the project**
 ```bash
-git clone https://github.com/your-username/paris-traffic-simulation.git
-cd paris-traffic-simulation
+git clone https://github.com/yvann-ba/realtime-paris-density-simulation.git
+cd realtime-paris-density-simulation
 ```
 
 2. **Install dependencies**
@@ -62,8 +66,3 @@ The simulation relies on several key concepts:
 3. **Gaussian Interpolation**: Heatmap points are calculated via a Gaussian falloff function to create natural gradients.
 4. **Jittering**: Random variations added to simulate the organic nature of crowds.
 
-## License
-
-MIT License
-
-Made with ❤️ for urban data visualization.
